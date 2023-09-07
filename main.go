@@ -44,10 +44,14 @@ func main() {
 
 		fmt.Println()
 
-		fmt.Print("Enter menu option (a, b, or c): ")
+		fmt.Print("Enter menu option (a, b, or c, or q to quit): ")
 		var first string
 
 		fmt.Scan(&first)
+
+		if first[0] == 'q' {
+			return
+		}
 
 		switch first {
 		case "a":
