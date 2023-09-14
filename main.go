@@ -1,19 +1,23 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type InternalData struct {
-	Week     int
-	Classes  []Class
-	LastDate time.Time
+	Week           int
+	Classes        []Class
+	LastDate       time.Time
+	ClassDirectory string
 }
 
 type Class struct {
@@ -25,6 +29,8 @@ func main() {
 	clearOutput()
 	internalData := readInternalData()
 
+	checkData(&internalData)
+
 	for {
 
 		internalData.LastDate = time.Now()
@@ -33,18 +39,19 @@ func main() {
 
 		fmt.Printf("Current Date: %v %v, %v\n", month, day, year)
 		fmt.Printf("Current Week: %v\n", internalData.Week)
+		fmt.Printf("Current Directory: %v\n", internalData.ClassDirectory)
 
 		fmt.Println()
 
 		fmt.Println("a: Start a new NOTR")
-		fmt.Println("b: Create a new class")
+		fmt.Println("b: Modify classes")
 		fmt.Println("c: Change week number")
-		fmt.Println("d: Change class information")
+		fmt.Println("d: Move to new Semester")
 		fmt.Println("e: Set class directory")
 
 		fmt.Println()
 
-		fmt.Print("Enter menu option (a, b, or c, or q to quit): ")
+		fmt.Print("Enter menu option (a to e, or q to quit): ")
 		var first string
 
 		fmt.Scan(&first)
@@ -57,15 +64,71 @@ func main() {
 		case "a":
 			createNOTR(internalData)
 		case "b":
-			//createClass
+			//modifyClasses
+			notImplemented()
 		case "c":
-			//changeWeek
+			setWeek(&internalData)
 		case "d":
-			//changeClassInformation
+			//newSemester
+			notImplemented()
 		case "e":
-			//setClassDirectory
+			setClassDirectory(&internalData)
 		}
 
+	}
+}
+
+func setWeek(internalData *InternalData) {
+	for {
+		fmt.Println()
+		fmt.Print("Enter new week number (or q to quit): ")
+		var first string
+		fmt.Scan(&first)
+
+		if first[0] == 'q' {
+			return
+		}
+
+		num, err := strconv.Atoi(first)
+		if err != nil {
+			fmt.Println("Please enter a valid number.")
+		} else {
+			internalData.Week = num
+			fmt.Println()
+			break
+		}
+	}
+}
+
+func setClassDirectory(internalData *InternalData) {
+	for {
+		fmt.Println()
+		fmt.Print("Enter fully resolved path name for new directory (or q for quit): ")
+		reader := bufio.NewReader(os.Stdin)
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		line = strings.TrimRight(line, "\n")
+
+		if line[0] == 'q' {
+			return
+		}
+
+		if _, err := os.Stat(line); err != nil {
+			if os.IsNotExist(err) {
+				fmt.Println("Folder does not exist.")
+				fmt.Println(line)
+			} else {
+				panic(err)
+			}
+		} else {
+			line, _ = filepath.Abs(line)
+			fmt.Println("Folder DOES exist!")
+			internalData.ClassDirectory = line
+			break
+		}
 	}
 }
 
@@ -91,17 +154,24 @@ func createNOTR(internalData InternalData) {
 	if err != nil {
 		panic(err)
 	}
-
 	class := internalData.Classes[parsedInput-1]
-	fmt.Printf("Class %v\n", class)
 	year, month, day := internalData.LastDate.Date()
+	name := generateNoteName()
+	stub := generateStub(class.Code, internalData.Week, internalData.LastDate)
+	filepath := internalData.ClassDirectory + "/" + name
+
+	fmt.Printf("Class %v\n", class)
 	fmt.Printf("Current Date: %v-%v-%v\n", year, month, day)
 	fmt.Printf("Current Week %v\n", internalData.Week)
 	fmt.Printf("Started TextEdit with file name: %v\n", "NOTES")
-	createFile("NOTES")
-	stub := generateStub(class.Code, internalData.Week, internalData.LastDate)
-	populateFile("NOTES", stub)
-	openFile("NOTES")
+
+	createFile(filepath)
+	populateFile(filepath, stub)
+	openFile(filepath)
+}
+
+func generateNoteName() string {
+	return "NOTes"
 }
 
 func check(e error) {
@@ -119,7 +189,7 @@ func generateStub(class string, week int, time time.Time) (buf string) {
 
 func populateFile(name string, stub string) {
 	fmt.Println(name)
-	f, err := os.OpenFile("./"+name, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	f, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	check(err)
 	defer f.Close()
 	n2, err := f.Write([]byte(stub))
@@ -198,4 +268,17 @@ func clearOutput() {
 	}
 
 	fmt.Println(string(stdout))
+}
+
+func notImplemented() {
+	println()
+	println("Function is not implemented yet")
+	println()
+}
+
+func checkData(internalData *InternalData) {
+	if internalData.ClassDirectory == "" {
+		println("Unfortunately, the config file under ~/.config/notr does not have a value for the class directory.")
+		setClassDirectory(internalData)
+	}
 }
