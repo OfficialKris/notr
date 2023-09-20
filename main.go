@@ -11,7 +11,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/officialkris/notr/config"
 )
+
+var DevMode = false
 
 type InternalData struct {
 	Week           int
@@ -37,8 +41,13 @@ func main() {
 		year, month, day := internalData.LastDate.Date()
 		writeInternalData(internalData)
 
+		if config.DEV_MODE {
+			fmt.Println("DEV_MODE ENABLED: USE WITH CARE")
+		}
+
 		fmt.Printf("Current Date: %v %v, %v\n", month, day, year)
 		fmt.Printf("Current Week: %v\n", internalData.Week)
+		fmt.Printf("Current Config Directory: ~%v\n", config.CONFIG_LOCATION+config.CONFIG_FILE_NAME)
 		fmt.Printf("Current Directory: %v\n", internalData.ClassDirectory)
 
 		fmt.Println()
@@ -235,21 +244,21 @@ func writeInternalData(data InternalData) {
 		return
 	}
 	usr, _ := user.Current()
-	path := usr.HomeDir + "/.config/notr/"
+	path := usr.HomeDir + config.CONFIG_LOCATION
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, 0700)
 	}
-	err1 := os.WriteFile(path+"config.json", []byte(jsonData), 0644)
+	err1 := os.WriteFile(path+config.CONFIG_FILE_NAME, []byte(jsonData), 0644)
 	check(err1)
 }
 
 func readInternalData() (returnData InternalData) {
 	usr, _ := user.Current()
-	path := usr.HomeDir + "/.config/notr/"
+	path := usr.HomeDir + config.CONFIG_LOCATION
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, 0700)
 	}
-	data, err := os.ReadFile(path + "config.json")
+	data, err := os.ReadFile(path + config.CONFIG_FILE_NAME)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
