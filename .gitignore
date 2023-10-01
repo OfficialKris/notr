@@ -2,3 +2,4 @@ config.config
 main
 notr
 /class
+.DS_Store
