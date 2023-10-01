@@ -18,6 +18,7 @@ import (
 var DevMode = false
 
 type InternalData struct {
+	Version        string
 	Week           int
 	Classes        []Class
 	LastDate       time.Time
@@ -36,7 +37,7 @@ func main() {
 	checkData(&internalData)
 
 	for {
-
+		internalData.Version = config.PROGRAM_VERSION
 		internalData.LastDate = time.Now()
 		year, month, day := internalData.LastDate.Date()
 		writeInternalData(internalData)
@@ -45,6 +46,7 @@ func main() {
 			fmt.Println("DEV_MODE ENABLED: USE WITH CARE")
 		}
 
+		fmt.Printf("NOTR Version: %v\n\n", internalData.Version)
 		fmt.Printf("Current Date: %v %v, %v\n", month, day, year)
 		fmt.Printf("Current Week: %v\n", internalData.Week)
 		fmt.Printf("Current Config Directory: ~%v\n", config.CONFIG_LOCATION+config.CONFIG_FILE_NAME)
