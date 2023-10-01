@@ -9,15 +9,15 @@ A simple notaking wrapper for plain text notes!
 
 Install
 ```
-mage install
+task install
 ```
 
 Build
 ```
-mage build
+task build
 ```
 
 Developer Build (Creates separate config under ~/.config/notr-dev)
 ```
-mage dev
+task dev
 ```

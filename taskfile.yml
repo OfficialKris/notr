@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  dev:
+    cmds:
+      - go build -trimpath -ldflags="-s -w" -tags dev
+      - ./notr
+    # silent: true
+  build:
+    cmds:
+      - go mod download
+      - go build -trimpath -ldflags="-s -w"
+  install:
+    cmds:
+      - go install -ldflags="-s -w" ./... -tags prod
+  clean: rem notr 
+  # TODO: Make sure REM directory is clean and future set to OS trash
