@@ -65,6 +65,8 @@ func main() {
 
 		fmt.Scan(&first)
 
+		first = strings.ToLower(first)
+
 		if first[0] == 'q' {
 			return
 		}
@@ -142,7 +144,6 @@ func setClassDirectory(internalData *InternalData) {
 }
 
 func createNOTR(internalData InternalData) {
-	//fmt.Println(internalData.classes)
 	fmt.Println()
 	for i, s := range internalData.Classes {
 		fmt.Printf("%v: %v - %v\n", i+1, s.Code, s.Description)
@@ -169,18 +170,21 @@ func createNOTR(internalData InternalData) {
 	stub := generateStub(class.Code, internalData.Week, internalData.LastDate)
 	filepath := internalData.ClassDirectory + "/" + name
 
-	fmt.Printf("Class %v\n", class)
+	fmt.Println()
+	fmt.Printf("Class: %v\n", class)
 	fmt.Printf("Current Date: %v-%v-%v\n", year, month, day)
 	fmt.Printf("Current Week %v\n", internalData.Week)
-	fmt.Printf("Started TextEdit with file name: %v\n", "NOTES")
+	fmt.Printf("Started TextEdit with file name: %v\n", name)
 
 	createFile(filepath)
 	populateFile(filepath, stub)
 	openFile(filepath)
+
+	fmt.Println()
 }
 
 func generateNoteName() string {
-	return "NOTes"
+	return "NOTES" + ".txt" // TODO: Add number
 }
 
 func check(e error) {
