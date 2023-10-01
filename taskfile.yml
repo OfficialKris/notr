@@ -9,9 +9,8 @@ tasks:
   build:
     cmds:
       - go mod download
-      - go build -trimpath -ldflags="-s -w"
+      - go build -trimpath -ldflags="-s -w" -tags prod
   install:
     cmds:
       - go install -ldflags="-s -w" -tags prod
-  clean: rem notr 
-  # TODO: Make sure REM directory is clean and future set to OS trash
+  clean: rem -t ~/.Trash notr
