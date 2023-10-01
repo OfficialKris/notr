@@ -12,6 +12,6 @@ tasks:
       - go build -trimpath -ldflags="-s -w"
   install:
     cmds:
-      - go install -ldflags="-s -w" ./... -tags prod
+      - go install -ldflags="-s -w" -tags prod
   clean: rem notr 
   # TODO: Make sure REM directory is clean and future set to OS trash
