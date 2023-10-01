@@ -57,7 +57,7 @@ func main() {
 		fmt.Println("a: Start a new NOTR")
 		fmt.Println("b: Modify classes")
 		fmt.Println("c: Change week number")
-		fmt.Println("d: Move to new Semester")
+		fmt.Println("d: Reload date")
 		fmt.Println("e: Set class directory")
 
 		fmt.Println()
@@ -82,7 +82,7 @@ func main() {
 		case "c":
 			setWeek(&internalData)
 		case "d":
-			//newSemester
+			//reloadDate
 			notImplemented()
 		case "e":
 			setClassDirectory(&internalData)
